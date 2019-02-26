@@ -7,10 +7,11 @@ var User = require('../models/user');
 exports.getExpededInHats = async function(req, res) {
   var usersReturn = [];
   const SIZE = 50;
-  var page = 1;
-  if (req.query.page) {
-    page = parseInt(req.query.page);
-  }
+  var page = req.query.page ? parseInt(req.query.page) : 1;
+  var range = req.query.range ? req.query.range : '-1,5000';
+  var rangeInit = parseInt(range.split(',')[0]);
+  var rangeEnd = parseInt(range.split(',')[1]);
+
   var users = await User.aggregate([{
       $lookup: {
         from: 'hats',
@@ -31,6 +32,14 @@ exports.getExpededInHats = async function(req, res) {
           $sum: {
             $toInt: '$hats.price'
           }
+        }
+      }
+    },
+    {
+      $match: {
+        expended: {
+          $gt: rangeInit,
+          $lt: rangeEnd
         }
       }
     },
