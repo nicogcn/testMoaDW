@@ -68,22 +68,21 @@ exports.getExpededInHats = async function(req, res) {
 
 exports.getRecommendedHats = async function(req, res) {
   const SIZE = 50;
-  var page = 1;
-  if (req.query.page) {
-    page = parseInt(req.query.page);
-  }
+  var page = req.query.page ? parseInt(req.query.page) : 1;
   var users = await User.find().skip(SIZE * (page - 1)).limit(SIZE).populate('recommendedHats');
-  //console.log(users);
-  var table = '<table>'
-  table += '<tr><th>Usuario</th><th>Sombrero 1</th><th>Sombrero 2</th><th>Sombrero 3</th></tr>'
+  var table = '<h1>RECOMENDACIONES</1>'
   for (var i = 0; i < users.length; i++) {
-    table += '<tr>'
-    table += '<td>' + users[i].email + '</td>';
+    table += '<h3>' + users[i].email + '</h3>';
+    table += '<table>'
+    table += '<tr><th>Sombrero</th><th>Material</th><th>Precio</th></tr>'
     for (var j = 0; j < users[i].recommendedHats.length; j++) {
+      table += '<tr>'
       table += '<td>' + users[i].recommendedHats[j].name + '</td>';
+      table += '<td>' + users[i].recommendedHats[j].material + '</td>';
+      table += '<td>' + users[i].recommendedHats[j].price + '</td>';
+      table += '</tr>'
     }
-    table += '</tr>'
+    table += '</table>'
   }
-  table += '</table>'
   res.status(200).write(table);
 }
